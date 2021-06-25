@@ -1,0 +1,10 @@
+<resources>
+    <!-- Glitches -->
+    <string-array name="glitch_entries">
+        <item>Ad Spam</item>
+        <item>Lunch Break</item>
+        <item>Night Time</item>
+        <item>Jokester</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/nav_graph"
+            app:startDestination="@id/joinGameFragment">
+
+    <fragment
+            android:id="@+id/joinGameFragment"
+            android:name="adamantpenguin.bookletx.JoinGameFragment"
+            android:label="Join game"
+            tools:layout="@layout/fragment_join_game">
+        <action android:id="@+id/action_joinGameFragment_to_settingsFragment" app:destination="@id/settingsFragment"
+                app:enterAnim="@android:anim/slide_in_left"
+                app:exitAnim="@android:anim/slide_out_right"
+                app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right" app:popUpToInclusive="false"/>
+        <action android:id="@+id/action_joinGameFragment_to_cheatModeFragment" app:destination="@id/cheatModeFragment"
+                app:popUpToInclusive="false" app:launchSingleTop="true" app:enterAnim="@android:anim/slide_in_left"
+                app:exitAnim="@android:anim/slide_out_right" app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right"/>
+        <argument android:name="gameId" app:argType="integer" android:defaultValue="0"/>
+        <deepLink android:id="@+id/deepLink2" app:uri="www.blooket.com/play?id={gameId}"/>
+    </fragment>
+    <fragment android:id="@+id/settingsFragment" android:name="adamantpenguin.bookletx.SettingsFragment"
+              android:label="@string/settings_label"/>
+    <fragment android:id="@+id/cheatModeFragment" android:name="adamantpenguin.bookletx.CheatModeFragment"
+              android:label="@string/cheat_mode_label" tools:layout="@layout/fragment_cheat_mode">
+        <argument android:name="username" app:argType="string"/>
+        <argument android:name="gameId" app:argType="integer"/>
+        <argument android:name="blook" app:argType="string" android:defaultValue="Fox"/>
+    </fragment>
+</navigation>

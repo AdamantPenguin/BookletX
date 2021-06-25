@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/cheat_visible_switch" android:icon="@drawable/ic_baseline_visible_24"
+          app:showAsAction="ifRoom" android:id="@+id/action_cheat_toggle"/>
+    <item android:title="@string/settings_label" android:icon="@drawable/ic_baseline_settings_24"
+          app:showAsAction="always" android:id="@+id/action_settings"/>
+</menu>

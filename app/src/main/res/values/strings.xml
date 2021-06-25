@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">BookletX</string>
+    <string name="join_game_label">Join a live game</string>
+    <string name="game_id_hint">Game ID</string>
+    <string name="username_hint">Nickname</string>
+    <string name="settings_label">Settings</string>
+    <string name="join_game_button">Join game</string>
+    <string name="cheat_switch">Cheat mode</string>
+    <string name="cheat_visible_switch">Toggle cheat mode box</string>
+    <string name="settings_general">General</string>
+    <string name="settings_cheat_default">Enable cheat mode by default</string>
+    <string name="footnote_label">BookletX</string>
+    <string name="cheat_mode_label">Cheat mode</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="enter_game_button">Enter game</string>
+    <string name="nav_up_warning">Warning: don\'t press the up button, it will break the app! Sorry!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_no_game">Game does not exist! Go back and try again.</string>
+    <string name="error_name_taken">Nickname is already taken! Go back and try again.</string>
+    <string name="error_unknown">An unknown error occured. Try again later.</string>
+    <string name="exit_game_button">Exit game</string>
+    <string name="conn_success">Successfully connected to game</string>
+    <string name="update_balance_button">Update</string>
+    <string name="new_balance_hint">New balance</string>
+    <string name="glitch_button">Glitch</string>
+</resources>
