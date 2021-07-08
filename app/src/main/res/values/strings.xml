@@ -18,10 +18,16 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="error_no_game">Game does not exist! Go back and try again.</string>
     <string name="error_name_taken">Nickname is already taken! Go back and try again.</string>
-    <string name="error_unknown">An unknown error occured. Try again later.</string>
+    <string name="error_unknown">An unknown error occurred. Try again later.</string>
     <string name="exit_game_button">Exit game</string>
     <string name="conn_success">Successfully connected to game</string>
     <string name="update_balance_button">Update</string>
     <string name="new_balance_hint">New balance</string>
     <string name="glitch_button">Glitch</string>
+    <string name="conn_gone">Disconnected</string>
+    <string name="game_over">Game finished</string>
+    <string name="read_instructions">Read the instructions on the host\'s screen</string>
+    <string name="conn_failed">Connection failed. Make sure you\'re online.</string>
+    <string name="hacker_password_hint">New password</string>
+    <string name="set_password_button">Set</string>
 </resources>

@@ -19,6 +19,7 @@ public class BlooketGame {
     private String blook = "Fox"; // default value in case something goes wrong setting it later
     private String fbToken = "";
     private Long balance = 0L;
+    private String hackerPassword = "";
     private String stg = "join";
     private final DatabaseReference db;
     private FirebaseAuth fbAuth;
@@ -26,6 +27,10 @@ public class BlooketGame {
     public enum Glitch {
         JOKESTER, LUNCH_BREAK, NIGHT_TIME, AD_SPAM
     }
+
+    public static final String[] gamemodeNames = {
+            "inst", "fact", "hack"  // TODO add all modes
+    };
 
     /**
      * Blooket game interaction helper class thing.
@@ -56,7 +61,7 @@ public class BlooketGame {
                     this.gameId < 775e3 ? urls[5] :
                     this.gameId < 887500 ? urls[6] :
                     urls[7];
-            FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
+            FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()  // data here taken from blooket.com's JS
                     .setApiKey("AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU")
                     .setApplicationId("1:741533559105:web:b8cbb10e6123f2913519c0")
                     .setProjectId("blooket-2020")
@@ -74,14 +79,15 @@ public class BlooketGame {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 String value = (String) snapshot.getValue();
                 if (value != null ) stg = value;
-                if (!stg.equals("join") && !stg.equals("fin")) { // once game started, register balance updater
-                    db.child("c").child(username).child("ca").addValueEventListener(balanceUpdater);
+                if (!stg.equals("join") && !stg.equals("fin") && !stg.equals("inst")) {
+                    // once game started, register balance updater
+                    db.child("c").child(username).child(balanceKeyName(stg)).addValueEventListener(balanceUpdater);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-                Log.w("DbError", error.toException());
+            public void onCancelled(@NonNull @NotNull DatabaseError error)  {
+                 Log.w("DbError", error.toException());
             }
         });
     }
@@ -95,6 +101,17 @@ public class BlooketGame {
         this.fbToken = fbToken;
         this.fbAuth = FirebaseAuth.getInstance();
         this.fbAuth.signInWithCustomToken(this.fbToken);
+    }
+    public String getHackerPassword() { return this.hackerPassword; }
+    public boolean setHackerPassword(String password) {
+        if (this.stg.equals("hack")) {  // don't do anything if wrong gamemode
+            try {
+                this.hackerPassword = password;
+                this.db.child("c").child(this.username).child("p").setValue(password);
+                return true;
+            } catch (Exception ignored) {}
+        }
+        return false;  // return success or not
     }
 
     /**
@@ -115,7 +132,7 @@ public class BlooketGame {
         RequestBody body = RequestBody.create(data, JSON);
 
         String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                         + "QtWebEngine/5.15.2 Chrome/83.0.4103.122 Safari/537.36"; // pretend to be a web browser
+                         + "QtWebEngine/5.15.2 Chrome/83.0.4103.122 Safari/537.36";  // pretend to be a web browser
         Request request = new Request.Builder()
                 .url("https://api.blooket.com/api/firebase/join")
                 .addHeader("Referer", "https://www.blooket.com/")
@@ -128,6 +145,23 @@ public class BlooketGame {
         client.newCall(request).enqueue(callback);
     }
 
+    private String balanceKeyName(String stg) {
+        switch (stg) {
+            case "hack": return "c";
+            case "fact": return "ca";
+            default: return "";
+        }
+    }
+
+
+    /**
+     * Do something when the 'stg' value (usually represents gamemode) changes
+     * @param listener ValueEventListener for what to do
+     */
+    public void onStgChanged(ValueEventListener listener) {
+        this.db.child("stg").addValueEventListener(listener);
+    }
+
     public void enterGame() {
         HashMap<String, String> data = new HashMap<>();
         data.put("b", this.blook);
@@ -138,7 +172,7 @@ public class BlooketGame {
     }
 
     public void setBalance(int amount) {
-        this.db.child("c").child(this.username).child("ca").setValue(amount);
+        this.db.child("c").child(this.username).child(balanceKeyName(stg)).setValue(amount);
     }
     ValueEventListener balanceUpdater = new ValueEventListener() {
         @Override
@@ -165,5 +199,5 @@ public class BlooketGame {
         }
         this.db.child("c").child(username).child("tat").setValue(glitchCode);
     }
-    // TODO add other methods such as setBalance
+    // TODO add other methods for specific gamemodes
 }
