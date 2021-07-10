@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">BookletX</string>
     <string name="join_game_label">Join a live game</string>
     <string name="game_id_hint">Game ID</string>
     <string name="username_hint">Nickname</string>
@@ -9,7 +9,6 @@
     <string name="cheat_visible_switch">Toggle cheat mode box</string>
     <string name="settings_general">General</string>
     <string name="settings_cheat_default">Enable cheat mode by default</string>
-    <string name="footnote_label" translatable="false">BookletX</string>
     <string name="cheat_mode_label">Cheat mode</string>
     <string name="status_connecting">Connecting…</string>
     <string name="enter_game_button">Enter game</string>
@@ -22,8 +21,8 @@
     <string name="update_balance_button">Update</string>
     <string name="new_balance_hint">New balance</string>
     <string name="glitch_button">Glitch</string>
-    <string name="conn_gone">Disconnected</string>
     <string name="game_over">Game finished</string>
+    <string name="conn_gone">Disconnected</string>
     <string name="read_instructions">Read the instructions on the host\'s screen</string>
     <string name="conn_failed">Connection failed. Make sure you\'re online.</string>
     <string name="hacker_password_hint">Enter password</string>

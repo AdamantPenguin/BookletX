@@ -19,8 +19,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Vector;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -94,7 +97,7 @@ public class CheatModeFragment extends Fragment {
         // hide all the gamemode-specific stuff
         ArrayList<View> hideMe = getViewsByTag((ViewGroup) root, "allMode");
         for (View view : hideMe) { view.setVisibility(View.GONE); }
-        for (String name : BlooketGame.gamemodeNames) {
+        for (String name : BlooketGame.supportedGamemodeNames) {
             hideMe = getViewsByTag((ViewGroup) root, name + "Mode");
             for (View view : hideMe) { view.setVisibility(View.GONE); }
         }
@@ -180,33 +183,93 @@ public class CheatModeFragment extends Fragment {
                             return;  // also prevent later NPEs
                         }
 
+                        boolean isGameStarted = !value.equals("join") && !value.equals("fin") && !value.equals("inst");
+
                         // hide everything first
-                        for (String name : BlooketGame.gamemodeNames) {
+                        for (String name : BlooketGame.supportedGamemodeNames) {
                             ArrayList<View> hideMe = getViewsByTag((ViewGroup) root, name + "Mode");
                             for (View view : hideMe) { view.setVisibility(View.GONE); }
                         }
 
-                        // show allMode things if it's not join or fin, otherwise hide
+                        // show allMode things if it's not join/fin/inst, otherwise hide
                         ArrayList<View> allModeTagged = getViewsByTag((ViewGroup) root, "allMode");
-                        if (!value.equals("join") && !value.equals("fin")) {
+                        if (isGameStarted) {
                             for (View view : allModeTagged) { view.setVisibility(View.VISIBLE); }
                         } else {
                             for (View view : allModeTagged) { view.setVisibility(View.GONE); }
-                            if (value.equals("fin")) { statusText.setText(R.string.game_over); }
+                            if (value.equals("fin")) {
+                                statusText.setText(R.string.game_over);
+                                // TODO send bogus question answer stats
+                            }
                         }
 
                         // show items for gamemode
                         ArrayList<View> showMe = getViewsByTag((ViewGroup) root, value + "Mode");
                         for (View view : showMe) { view.setVisibility(View.VISIBLE); }
+
+
+                        // also register balance self-monitor-er™ once game is started
+                        if (isGameStarted) {
+                            game.onBalanceChanged(game.getUsername(), new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                    if (snapshot.getValue() != null) {
+                                        long value = (long) snapshot.getValue();
+                                        String formattedBalance = balanceFormatter.format(value);
+                                        statusText.setText(String.format(
+                                                Locale.ENGLISH,
+                                                "%s: %s",
+                                                getString(R.string.balance_indicator_status), formattedBalance
+                                        ));
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                            });
+                        }
                     }
 
                     @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {}
+                });
 
+                // when someone joins or leaves
+                game.onPlayersChanged(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        // don't run with no players, to avoid screwing up the layout
+                        if (snapshot.getChildrenCount() > 0) {
+                            Iterable<DataSnapshot> children = snapshot.getChildren();
+                            ArrayList<String> players = new ArrayList<>();
+                            for (DataSnapshot child : children) {
+                                players.add(child.getKey());
+                            }
+
+                            // update spinners for player choosing
+                            Spinner[] updateMe = {
+                                    root.findViewById(R.id.hackPlayerChooser),
+                                    root.findViewById(R.id.stealPlayerChooser)
+                            };
+
+                            for (Spinner spinner : updateMe) {
+                                spinner.setAdapter(new ArrayAdapter<>(
+                                        root.getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        players
+                                ));
+                            }
+                        }
                     }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {}
                 });
             }
         });
+
+
+        // button onClicks
 
         Button enterButton = root.findViewById(R.id.enterGameButton);
         enterButton.setOnClickListener(this::onEnterButtonClicked);
@@ -223,15 +286,29 @@ public class CheatModeFragment extends Fragment {
         Button setPasswordButton = root.findViewById(R.id.setPasswordButton);
         setPasswordButton.setOnClickListener(this::onSetPasswordButtonClicked);
 
+        Button kickPlayerButton = root.findViewById(R.id.kickPlayerButton);
+        kickPlayerButton.setOnClickListener(this::onKickPlayerButtonClicked);
+
+        Button hackButton = root.findViewById(R.id.hackButton);
+        hackButton.setOnClickListener(this::onHackButtonClicked);
+
+        Button stealButton = root.findViewById(R.id.stealButton);
+        stealButton.setOnClickListener(this::onStealButtonClicked);
+
         return root;
     }
 
     public void onEnterButtonClicked(View v) { this.game.enterGame(); }
     public void onExitButtonClicked(View v) { this.game.exitGame(); }
+    public void onKickPlayerButtonClicked(View v) {
+        Spinner playerChooser = requireView().findViewById(R.id.kickPlayerChooser);
+        String targetUsername = (String) playerChooser.getSelectedItem();
+        this.game.kickPlayer(targetUsername);
+    }
     public void onBalanceUpdateButtonClicked(View v) {
         EditText editBalance = requireView().findViewById(R.id.editBalance);
         try {
-            int newBalance = Integer.parseInt(editBalance.getText().toString());
+            int newBalance = Integer.parseInt(String.valueOf(editBalance.getText()));
             this.game.setBalance(newBalance);
             editBalance.setText("");
         } catch (Exception ignored) {}
@@ -251,9 +328,38 @@ public class CheatModeFragment extends Fragment {
     public void onSetPasswordButtonClicked(View v) {
         EditText editPassword = requireView().findViewById(R.id.editHackerPassword);
         if (this.game.setHackerPassword(editPassword.getText().toString())) {
+            /*
             // if it worked, remove box since password should only be set once
             editPassword.setVisibility(View.GONE);
-            v.setVisibility(View.GONE);
+            v.setVisibility(View.GONE);*/
+
+            // if it worked, clear box (don't remove because why not :D)
+            editPassword.setText("");
         }
     }
+    public void onHackButtonClicked(View v) {
+        Spinner playerChooser = requireView().findViewById(R.id.hackPlayerChooser);
+        String targetUsername = (String) playerChooser.getSelectedItem();
+
+        EditText editAmount = requireView().findViewById(R.id.editHackAmount);
+        try {
+            long hackAmount = Long.parseLong(String.valueOf(editAmount.getText()));
+            this.game.hackPlayer(targetUsername, hackAmount);
+            editAmount.setText("");
+        } catch (Exception ignored) {}
+    }
+    public void onStealButtonClicked(View v) {
+        Spinner playerChooser = requireView().findViewById(R.id.stealPlayerChooser);
+        String targetUsername = (String) playerChooser.getSelectedItem();
+
+        EditText editAmount = requireView().findViewById(R.id.editStealAmount);
+        try {
+            long stealAmount = Long.parseLong(String.valueOf(editAmount.getText()));
+            this.game.stealGold(targetUsername, stealAmount, false);
+            editAmount.setText("");
+        } catch (Exception ignored) {}
+    }
+
+    // balance formatting to make it look nice
+    private final DecimalFormat balanceFormatter = new DecimalFormat("$###,###");
 }

@@ -7,4 +7,9 @@
         <item>Jokester</item>
     </string-array>
 
+    <!-- Default value for player chooser -->
+    <string-array name="default_player_spinner_entries">
+        <item>Players go here</item>
+    </string-array>
+
 </resources>
