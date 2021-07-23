@@ -21,3 +21,8 @@ Blooket uses a Firebase Realtime Database for multiplayer games;
 all this app does is write specific data to it. Since the database
 isn't very well protected, you can perform almost any action and there
 is no check to see if you're actually answering questions.
+
+## Note to Blooket
+As far as I can see, this app is legal and does not violate your ToS.
+If you want me to take it down (similarly to [this](//github.com/RedYetiDev/blooket.js)),
+I will do so *as long as you provide a valid legal reason.*
