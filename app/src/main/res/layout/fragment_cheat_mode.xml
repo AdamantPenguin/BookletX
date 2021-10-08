@@ -54,26 +54,8 @@
                     android:layout_marginTop="16dp"
                     android:textColor="#BF360C"
                     android:textAllCaps="false" android:textStyle="bold|italic"
-                    app:layout_constraintBottom_toTopOf="@+id/kickPlayerButton"/>
+                    app:layout_constraintBottom_toTopOf="@+id/updateBalanceButton"/>
             <!-- the kick player stuff is hidden due to not work -->
-            <Spinner
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content" android:id="@+id/kickPlayerChooser"
-                    app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"
-                    android:spinnerMode="dropdown"
-                    app:layout_constraintEnd_toStartOf="@+id/kickPlayerButton" android:tag="connected"
-                    android:entries="@array/default_player_spinner_entries" android:visibility="gone"
-                    tools:visibility="visible" app:layout_constraintBaseline_toBaselineOf="@+id/kickPlayerButton"/>
-            <Button
-                    android:text="@string/kick_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:id="@+id/kickPlayerButton"
-                    android:layout_marginEnd="16dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/kickPlayerChooser" android:layout_marginStart="16dp"
-                    android:tag="connected" android:visibility="gone" tools:visibility="visible"
-                    app:layout_constraintBottom_toTopOf="@+id/updateBalanceButton"
-                    app:layout_constraintTop_toBottomOf="@+id/instructionNotice" android:layout_marginTop="16dp"/>
             <EditText
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -92,8 +74,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginEnd="16dp" android:layout_marginStart="16dp"
                     app:layout_constraintStart_toEndOf="@+id/editBalance"
-                    android:tag="allMode" app:layout_constraintTop_toBottomOf="@+id/kickPlayerButton"
-                    android:layout_marginTop="8dp"
+                    android:tag="allMode" app:layout_constraintTop_toBottomOf="@+id/instructionNotice"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintBottom_toTopOf="@+id/glitchButton"/>
             <Spinner
                     android:layout_width="0dp"
@@ -131,7 +113,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/glitchButton" android:layout_marginTop="8dp"
                     android:layout_marginStart="16dp" app:layout_constraintStart_toEndOf="@+id/editHackerPassword"/>
             <Spinner
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content" android:id="@+id/hackPlayerChooser"
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="16dp" android:entries="@array/default_player_spinner_entries"
@@ -158,7 +140,7 @@
                     app:layout_constraintBottom_toTopOf="@+id/stealButton"
                     app:layout_constraintTop_toBottomOf="@+id/setPasswordButton" android:layout_marginTop="8dp"/>
             <Spinner
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content" android:id="@+id/stealPlayerChooser"
                     app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"
                     android:entries="@array/default_player_spinner_entries"
@@ -181,7 +163,25 @@
                     android:layout_marginEnd="16dp" app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/hackButton" android:layout_marginTop="8dp"
                     app:layout_constraintStart_toEndOf="@+id/editStealAmount" android:layout_marginStart="16dp"
-                    android:tag="goldMode"/>
+                    android:tag="goldMode"
+                    app:layout_constraintBottom_toTopOf="@+id/setBlookButton"/>
+            <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textShortMessage|textCapWords"
+                    android:ems="10"
+                    android:id="@+id/editBlookName"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/setBlookButton"
+                    app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"
+                    app:layout_constraintEnd_toStartOf="@+id/setBlookButton" android:hint="@string/blook_hint"
+                    android:tag="joinMode" android:importantForAutofill="no"/>
+            <Button
+                    android:text="@string/set_blook_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:id="@+id/setBlookButton"
+                    app:layout_constraintTop_toBottomOf="@+id/stealButton" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="16dp" android:layout_marginTop="8dp" android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@+id/editBlookName" android:tag="joinMode"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

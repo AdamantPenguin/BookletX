@@ -1,6 +1,7 @@
 package adamantpenguin.bookletx;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -49,14 +50,12 @@ public class JoinGameFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_settings:  {
                 // navigate to settings screen
-                System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOO");
                 NavController navController = Navigation.findNavController(requireView());
                 NavDirections action = JoinGameFragmentDirections.actionJoinGameFragmentToSettingsFragment();
                 navController.navigate(action);
                 return true;
             }
             case R.id.action_cheat_toggle: {
-                System.out.println("EEEEEEEEEEEEEEEEEEE");
                 // toggle cheats
                 CheckBox cheatBox = requireView().findViewById(R.id.cheatModeToggler);
                 if (cheatBox.getVisibility() == View.GONE) {
@@ -75,6 +74,7 @@ public class JoinGameFragment extends Fragment {
     public void onJoinButtonClicked(View v) {
         View parent = requireView();
         String username;
+        String blook;
         int gameId;
         // use try/catch to ensure fields are filled
         try {
@@ -95,14 +95,15 @@ public class JoinGameFragment extends Fragment {
 
         // navigate to appropriate mode
         NavController navController = Navigation.findNavController(requireView());
-        NavDirections action = null;  // assigning null to make IntelliJ shut up
+        NavDirections action;
         if (cheatMode) {
             action = JoinGameFragmentDirections.actionJoinGameFragmentToCheatModeFragment(
-                    username, gameId  // TODO add blook argument here
+                    username, gameId
             );
         } else {
-            // TODO handle this
-            System.out.println("NYI");
+            // TODO legit mode
+            Log.e("NYI", "Legit mode not implemented");
+            return;
         }
         navController.navigate(action);
     }

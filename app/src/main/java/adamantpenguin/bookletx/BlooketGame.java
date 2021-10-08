@@ -25,7 +25,7 @@ public class BlooketGame {
     private FirebaseAuth fbAuth;
 
     public enum Glitch {
-        JOKESTER, LUNCH_BREAK, NIGHT_TIME, AD_SPAM
+        JOKESTER, LUNCH_BREAK, NIGHT_TIME, AD_SPAM  // TODO add all the glitches
     }
 
     public static final String[] supportedGamemodeNames = {
@@ -98,6 +98,14 @@ public class BlooketGame {
     public void setUsername(String username) { this.username = username; }
     public String getBlook() { return this.blook; }
     public void setBlook(String blook) { this.blook = blook; }
+    public boolean updateBlook(String blook) {
+        try {
+            this.blook = blook;
+            this.db.child("c").child(this.username).child("b").setValue(blook);
+            return true;
+        } catch (Exception ignored) {}
+        return false;
+    }
     public void setToken(String fbToken) {
         this.fbToken = fbToken;
         this.fbAuth = FirebaseAuth.getInstance();
@@ -113,6 +121,17 @@ public class BlooketGame {
             } catch (Exception ignored) {}
         }
         return false;  // return success or not
+    }
+    public void sendAnswerStats() {
+        // TODO allow giving real stats as parameter(s)
+        HashMap<String, Integer> corrects = new HashMap<>();
+        corrects.put("1", 10);  // says i got question 1 correct 10 times
+
+        HashMap<String, Integer> incorrects = new HashMap<>();
+        incorrects.put("2", 1);  // says i got question 2 wrong once
+
+        this.db.child("c").child(this.username).child("c").setValue(corrects);
+        this.db.child("c").child(this.username).child("i").setValue(incorrects);
     }
 
     /**
@@ -186,10 +205,7 @@ public class BlooketGame {
         data.put("b", this.blook);
         this.db.child("c").child(this.username).setValue(data);
     }
-    public void kickPlayer(String targetUsername) {
-        this.db.child("c").child(targetUsername).removeValue();
-    }
-    public void exitGame() { kickPlayer(this.username); }  // leaving is just kicking yourself
+    public void exitGame() { this.db.child("c").child(this.username).removeValue(); }
 
     // balance-related methods
     public void setBalance(long amount) {
@@ -200,7 +216,7 @@ public class BlooketGame {
         public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
             try {
                 balance = (Long) snapshot.getValue();
-            } catch (NullPointerException ignored) {}
+            } catch (Exception ignored) {}
         }
 
         @Override

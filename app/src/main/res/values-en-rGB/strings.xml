@@ -12,7 +12,6 @@
     <string name="cheat_mode_label">Cheat mode</string>
     <string name="status_connecting">Connecting…</string>
     <string name="enter_game_button">Enter game</string>
-    <string name="nav_up_warning">Warning: don\'t press the up button, it will break the app! Sorry!</string>
     <string name="error_no_game">Game does not exist! Go back and try again.</string>
     <string name="error_name_taken">Nickname is already taken! Go back and try again.</string>
     <string name="error_unknown">An unknown error occurred. Try again later.</string>
@@ -33,4 +32,6 @@
     <string name="hack_button">Hack</string>
     <string name="steal_button">Steal</string>
     <string name="steal_amount_hint">Amount</string>
+    <string name="blook_hint">Blook</string>
+    <string name="set_blook_button">Set</string>
 </resources>

@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Vector;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,10 +33,14 @@ public class CheatModeFragment extends Fragment {
 
     private static final String ARG_USERNAME = "username";
     private static final String ARG_GAMEID = "gameId";
+    private static final String ARG_BLOOK = "blook";
 
     private String mUsername;
     private int mGameId;
+    private String mBlook;
+
     private BlooketGame game;
+    private long oldPlayerCount = 0;  // for the player list updater
 
     public CheatModeFragment() {
         // Required empty public constructor
@@ -49,13 +52,15 @@ public class CheatModeFragment extends Fragment {
      *
      * @param username Username/nickname
      * @param gameId Game ID
+     * @param blook Blook name
      * @return A new instance of fragment CheatModeFragment.
      */
-    public static CheatModeFragment newInstance(String username, int gameId) {
+    public static CheatModeFragment newInstance(String username, int gameId, String blook) {
         CheatModeFragment fragment = new CheatModeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_USERNAME, username);
         args.putInt(ARG_GAMEID, gameId);
+        args.putString(ARG_BLOOK, blook);
         fragment.setArguments(args);
         return fragment;
     }
@@ -85,6 +90,7 @@ public class CheatModeFragment extends Fragment {
         if (getArguments() != null) {
             mUsername = getArguments().getString(ARG_USERNAME);
             mGameId = getArguments().getInt(ARG_GAMEID);
+            mBlook = getArguments().getString(ARG_BLOOK);
         }
     }
 
@@ -101,6 +107,8 @@ public class CheatModeFragment extends Fragment {
             hideMe = getViewsByTag((ViewGroup) root, name + "Mode");
             for (View view : hideMe) { view.setVisibility(View.GONE); }
         }
+        ArrayList<View> joinModeViews = getViewsByTag((ViewGroup) root, "joinMode");
+        for (View view : joinModeViews) { view.setVisibility(View.GONE); }
 
         // connect to game
         this.game = new BlooketGame(requireContext(), mGameId);
@@ -156,9 +164,11 @@ public class CheatModeFragment extends Fragment {
                     return;
                 }
 
-                // update blook if possible
+                // update blook
                 try {
-                    game.setBlook(responseJson.getString("blook"));
+                    game.setBlook(
+                            mBlook != null ? mBlook : responseJson.getString("blook")
+                    );
                 } catch (JSONException ignored) {}
 
                 // enable connection-based views
@@ -190,6 +200,8 @@ public class CheatModeFragment extends Fragment {
                             ArrayList<View> hideMe = getViewsByTag((ViewGroup) root, name + "Mode");
                             for (View view : hideMe) { view.setVisibility(View.GONE); }
                         }
+                        ArrayList<View> joinModeViews = getViewsByTag((ViewGroup) root, "joinMode");
+                        for (View view : joinModeViews) { view.setVisibility(View.GONE); }
 
                         // show allMode things if it's not join/fin/inst, otherwise hide
                         ArrayList<View> allModeTagged = getViewsByTag((ViewGroup) root, "allMode");
@@ -199,7 +211,7 @@ public class CheatModeFragment extends Fragment {
                             for (View view : allModeTagged) { view.setVisibility(View.GONE); }
                             if (value.equals("fin")) {
                                 statusText.setText(R.string.game_over);
-                                // TODO send bogus question answer stats
+                                game.sendAnswerStats();  // send bogus stats about correct and incorrect answers
                             }
                         }
 
@@ -214,8 +226,13 @@ public class CheatModeFragment extends Fragment {
                                 @Override
                                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                                     if (snapshot.getValue() != null) {
-                                        long value = (long) snapshot.getValue();
-                                        String formattedBalance = balanceFormatter.format(value);
+                                        String formattedBalance;
+                                        try {
+                                            long value = (long) snapshot.getValue();
+                                            formattedBalance = balanceFormatter.format(value);
+                                        } catch (ClassCastException e) {
+                                            formattedBalance = "Something other than a number :/";
+                                        }
                                         statusText.setText(String.format(
                                                 Locale.ENGLISH,
                                                 "%s: %s",
@@ -239,7 +256,8 @@ public class CheatModeFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         // don't run with no players, to avoid screwing up the layout
-                        if (snapshot.getChildrenCount() > 0) {
+                        // also don't run with the same players as last time obviously
+                        if (!(snapshot.getChildrenCount() == 0 || snapshot.getChildrenCount() == oldPlayerCount)) {
                             Iterable<DataSnapshot> children = snapshot.getChildren();
                             ArrayList<String> players = new ArrayList<>();
                             for (DataSnapshot child : children) {
@@ -259,6 +277,7 @@ public class CheatModeFragment extends Fragment {
                                         players
                                 ));
                             }
+                            oldPlayerCount = snapshot.getChildrenCount();
                         }
                     }
 
@@ -286,25 +305,20 @@ public class CheatModeFragment extends Fragment {
         Button setPasswordButton = root.findViewById(R.id.setPasswordButton);
         setPasswordButton.setOnClickListener(this::onSetPasswordButtonClicked);
 
-        Button kickPlayerButton = root.findViewById(R.id.kickPlayerButton);
-        kickPlayerButton.setOnClickListener(this::onKickPlayerButtonClicked);
-
         Button hackButton = root.findViewById(R.id.hackButton);
         hackButton.setOnClickListener(this::onHackButtonClicked);
 
         Button stealButton = root.findViewById(R.id.stealButton);
         stealButton.setOnClickListener(this::onStealButtonClicked);
 
+        Button setBlookButton = root.findViewById(R.id.setBlookButton);
+        setBlookButton.setOnClickListener(this::onSetBlookButtonClicked);
+
         return root;
     }
 
     public void onEnterButtonClicked(View v) { this.game.enterGame(); }
     public void onExitButtonClicked(View v) { this.game.exitGame(); }
-    public void onKickPlayerButtonClicked(View v) {
-        Spinner playerChooser = requireView().findViewById(R.id.kickPlayerChooser);
-        String targetUsername = (String) playerChooser.getSelectedItem();
-        this.game.kickPlayer(targetUsername);
-    }
     public void onBalanceUpdateButtonClicked(View v) {
         EditText editBalance = requireView().findViewById(R.id.editBalance);
         try {
@@ -328,11 +342,6 @@ public class CheatModeFragment extends Fragment {
     public void onSetPasswordButtonClicked(View v) {
         EditText editPassword = requireView().findViewById(R.id.editHackerPassword);
         if (this.game.setHackerPassword(editPassword.getText().toString())) {
-            /*
-            // if it worked, remove box since password should only be set once
-            editPassword.setVisibility(View.GONE);
-            v.setVisibility(View.GONE);*/
-
             // if it worked, clear box (don't remove because why not :D)
             editPassword.setText("");
         }
@@ -358,6 +367,12 @@ public class CheatModeFragment extends Fragment {
             this.game.stealGold(targetUsername, stealAmount, false);
             editAmount.setText("");
         } catch (Exception ignored) {}
+    }
+    public void onSetBlookButtonClicked(View v) {
+        EditText editBlookName = requireView().findViewById(R.id.editBlookName);
+        if (this.game.updateBlook(editBlookName.getText().toString())) {
+            editBlookName.setText("");
+        }
     }
 
     // balance formatting to make it look nice
