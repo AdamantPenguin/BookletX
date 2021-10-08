@@ -82,7 +82,8 @@
                     android:layout_height="wrap_content" android:id="@+id/glitchChooser"
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="16dp"
-                    android:entries="@array/glitch_entries" app:layout_constraintEnd_toStartOf="@+id/glitchButton"
+                    android:entries="@array/default_glitch_spinner_entries"
+                    app:layout_constraintEnd_toStartOf="@+id/glitchButton"
                     android:tag="factMode"
                     app:layout_constraintBaseline_toBaselineOf="@+id/glitchButton"/>
             <Button

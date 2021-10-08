@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class BlooketGame {
     private final int gameId;
@@ -24,9 +25,15 @@ public class BlooketGame {
     private final DatabaseReference db;
     private FirebaseAuth fbAuth;
 
-    public enum Glitch {
-        JOKESTER, LUNCH_BREAK, NIGHT_TIME, AD_SPAM  // TODO add all the glitches
-    }
+    public static final Map<String, String> glitches = new HashMap<>();
+    static {
+        glitches.put("j", "Jokester");
+        glitches.put("lb", "Lunch Break");
+        glitches.put("nt", "Night Time");
+        glitches.put("as", "Ad Spam");
+        glitches.put("e37", "Error 37");
+        glitches.put("f", "Flip");
+    }  // TODO add all glitches (if there are more)
 
     public static final String[] supportedGamemodeNames = {
             "inst", "fact", "hack", "gold", "def", "cafe"  // TODO add all modes
@@ -227,15 +234,18 @@ public class BlooketGame {
     public long getBalance() { return this.balance; }
 
     // glitch/hack/etc-related methods
-    public void doGlitch(Glitch glitch) {
-        String glitchCode = "";
-        switch (glitch) {
-            case JOKESTER: glitchCode = "j"; break;
-            case LUNCH_BREAK: glitchCode = "lb"; break;
-            case NIGHT_TIME: glitchCode = "nt"; break;
-            case AD_SPAM: glitchCode = "as"; break;
-        }
+    public void doGlitch(String glitchCode) {
         this.db.child("c").child(username).child("tat").setValue(glitchCode);
+    }
+    public static String glitchNameToGlitchCode(String glitchName) {
+        if (glitches.containsValue(glitchName)) {
+            for (Map.Entry<String, String> checkEntry : glitches.entrySet()) {
+                if (checkEntry.getValue().equals(glitchName)) {
+                    return checkEntry.getKey();
+                }
+            }
+        }
+        return "";
     }
     public void hackPlayer(String targetUsername, long amount) {
         this.db.child("c").child(this.username).child("tat").setValue(

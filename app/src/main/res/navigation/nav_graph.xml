@@ -28,5 +28,6 @@
               android:label="@string/cheat_mode_label" tools:layout="@layout/fragment_cheat_mode">
         <argument android:name="username" app:argType="string"/>
         <argument android:name="gameId" app:argType="integer"/>
+        <argument android:name="blook" app:argType="string" app:nullable="true"/>
     </fragment>
 </navigation>

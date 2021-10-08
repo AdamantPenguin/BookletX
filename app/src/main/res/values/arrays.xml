@@ -1,15 +1,12 @@
 <resources>
     <!-- Glitches -->
-    <string-array name="glitch_entries">
-        <item>Ad Spam</item>
-        <item>Lunch Break</item>
-        <item>Night Time</item>
-        <item>Jokester</item>
+    <string-array name="default_glitch_spinner_entries">
+        <item>Glitch selector</item>
     </string-array>
 
     <!-- Default value for player chooser -->
     <string-array name="default_player_spinner_entries">
-        <item>Players go here</item>
+        <item>Player selector</item>
     </string-array>
 
 </resources>

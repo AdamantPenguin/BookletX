@@ -20,9 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -109,6 +107,14 @@ public class CheatModeFragment extends Fragment {
         }
         ArrayList<View> joinModeViews = getViewsByTag((ViewGroup) root, "joinMode");
         for (View view : joinModeViews) { view.setVisibility(View.GONE); }
+
+        // set up the glitch spinner
+        Spinner glitchSpinner = root.findViewById(R.id.glitchChooser);
+        glitchSpinner.setAdapter(new ArrayAdapter<>(
+                root.getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                BlooketGame.glitches.values().toArray()
+        ));
 
         // connect to game
         this.game = new BlooketGame(requireContext(), mGameId);
@@ -329,15 +335,8 @@ public class CheatModeFragment extends Fragment {
     }
     public void onGlitchButtonClicked(View v) {
         Spinner glitchChooser = requireView().findViewById(R.id.glitchChooser);
-        int glitchId = glitchChooser.getSelectedItemPosition();
-        BlooketGame.Glitch[] glitches = {
-                BlooketGame.Glitch.AD_SPAM,
-                BlooketGame.Glitch.LUNCH_BREAK,
-                BlooketGame.Glitch.NIGHT_TIME,
-                BlooketGame.Glitch.JOKESTER
-        };
-        BlooketGame.Glitch glitch = glitches[glitchId];
-        this.game.doGlitch(glitch);
+        String glitchName = (String) glitchChooser.getSelectedItem();
+        this.game.doGlitch(BlooketGame.glitchNameToGlitchCode(glitchName));
     }
     public void onSetPasswordButtonClicked(View v) {
         EditText editPassword = requireView().findViewById(R.id.editHackerPassword);

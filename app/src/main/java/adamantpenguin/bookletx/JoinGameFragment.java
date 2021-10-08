@@ -98,7 +98,7 @@ public class JoinGameFragment extends Fragment {
         NavDirections action;
         if (cheatMode) {
             action = JoinGameFragmentDirections.actionJoinGameFragmentToCheatModeFragment(
-                    username, gameId
+                    username, gameId, null
             );
         } else {
             // TODO legit mode
